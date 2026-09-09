@@ -335,12 +335,11 @@ const Editor = {
 
     await DB.put(entry);
     this.currentId = entry.id;
-    this.status.textContent = "Saved";
     this.saveIndicator?.classList.remove("saving");
 
     if (!isSilent) {
       if (window.Auth && Auth.showToast) {
-        Auth.showToast("Journal entry saved.");
+        Auth.showToast(window.Auth.user ? "☁ Entry saved to your account!" : "Entry saved to device.");
       }
     }
     await App.refresh();

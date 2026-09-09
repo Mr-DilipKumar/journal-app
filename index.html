@@ -70,6 +70,7 @@
         <div class="top-actions">
           <button class="prompt-chip-btn" id="topbarPromptBtn"><span>✨</span> Daily prompt</button>
           <button class="icon-btn" id="themeTopBtn" title="Cycle theme" aria-label="Toggle theme">☼</button>
+          <span class="cloud-badge local" id="cloudSyncBadge" title="Account cloud sync status">📱 Local</span>
           <div class="auth-action-wrap">
             <button class="auth-trigger-btn" id="authTriggerBtn" aria-label="Account">
               <span class="avatar anon" id="userAvatar">Sign in</span>
@@ -79,6 +80,13 @@
                 <strong id="dropdownUserName">Account</strong>
                 <span id="dropdownUserEmail">user@example.com</span>
               </div>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item" id="syncNowBtn">
+                <span>☁</span> Sync cloud entries
+              </button>
+              <button class="dropdown-item" id="openSqlModalBtn">
+                <span>⚡</span> Database SQL setup
+              </button>
               <div class="dropdown-divider"></div>
               <button class="dropdown-item" id="logoutBtn">
                 <span>→</span> Sign out
@@ -170,6 +178,49 @@
   <div class="lightbox-overlay" id="lightboxOverlay" aria-hidden="true">
     <button class="lightbox-close" id="closeLightbox">×</button>
     <img id="lightboxImg" src="" alt="Enlarged memory">
+  </div>
+
+  <!-- Database SQL Setup Modal -->
+  <div class="modal-overlay" id="sqlModalOverlay" aria-hidden="true">
+    <div class="auth-modal sql-modal" role="dialog" aria-modal="true" aria-labelledby="sqlModalTitle">
+      <button class="modal-close-btn" id="closeSqlModal" aria-label="Close modal">×</button>
+      <div class="auth-header" style="margin-bottom:14px;">
+        <div class="brand-mark modal-brand">⚡</div>
+        <h2 id="sqlModalTitle">Supabase Database Setup</h2>
+        <p>Run this SQL in Supabase to enable PostgreSQL cloud sync with Row Level Security</p>
+      </div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 10px;">
+        Your entries automatically save to your user account metadata. To also create the dedicated PostgreSQL table, open your Supabase SQL Editor and run:
+      </p>
+      <pre class="sql-code-box" id="sqlCodeContent">create table if not exists public.entries (
+  id text primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  title text not null default 'Untitled reflection',
+  content text default '',
+  date date not null default current_date,
+  journal text default 'Personal',
+  favorite boolean default false,
+  mood text default 'neutral',
+  weather text default '',
+  location text default '',
+  tags jsonb default '[]'::jsonb,
+  photos jsonb default '[]'::jsonb,
+  audio text default '',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.entries enable row level security;
+
+create policy "Users can view own entries" on public.entries for select using (auth.uid() = user_id);
+create policy "Users can insert own entries" on public.entries for insert with check (auth.uid() = user_id);
+create policy "Users can update own entries" on public.entries for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "Users can delete own entries" on public.entries for delete using (auth.uid() = user_id);</pre>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button type="button" class="auth-submit-btn" id="copySqlBtn" style="margin-top:0;">📋 Copy SQL</button>
+        <a href="https://supabase.com/dashboard/project/uhpojlnkpliknifhlrft/sql/new" target="_blank" rel="noopener" class="auth-secondary-btn" style="text-align:center;text-decoration:none;padding:12px 16px;line-height:20px;white-space:nowrap;">Open Supabase ↗</a>
+      </div>
+    </div>
   </div>
 
   <!-- Auth Modal Dialog -->

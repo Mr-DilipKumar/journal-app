@@ -18,6 +18,11 @@ const App = {
     this.applyTheme();
     this.updateStreak();
     this.render();
+
+    // Trigger cloud sync if authenticated
+    if (window.Auth && Auth.user && typeof DB.syncWithCloud === "function") {
+      DB.syncWithCloud();
+    }
   },
 
   async seed() {

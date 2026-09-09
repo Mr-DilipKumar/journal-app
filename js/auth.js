@@ -244,6 +244,57 @@ const Auth = {
       logoutBtn.onclick = () => this.signOut();
     }
 
+    // Manual cloud sync button in dropdown
+    const syncBtn = document.getElementById("syncNowBtn");
+    if (syncBtn) {
+      syncBtn.onclick = () => {
+        this.closeUserMenu();
+        if (window.DB && typeof DB.syncWithCloud === "function") {
+          DB.syncWithCloud();
+        }
+      };
+    }
+
+    // SQL setup modal buttons
+    const openSqlBtn = document.getElementById("openSqlModalBtn");
+    const sqlModal = document.getElementById("sqlModalOverlay");
+    const closeSqlBtn = document.getElementById("closeSqlModal");
+    const copySqlBtn = document.getElementById("copySqlBtn");
+
+    if (openSqlBtn && sqlModal) {
+      openSqlBtn.onclick = () => {
+        this.closeUserMenu();
+        sqlModal.classList.add("show");
+        sqlModal.setAttribute("aria-hidden", "false");
+      };
+    }
+    if (closeSqlBtn && sqlModal) {
+      closeSqlBtn.onclick = () => {
+        sqlModal.classList.remove("show");
+        sqlModal.setAttribute("aria-hidden", "true");
+      };
+    }
+    if (sqlModal) {
+      sqlModal.onclick = (e) => {
+        if (e.target === sqlModal) {
+          sqlModal.classList.remove("show");
+          sqlModal.setAttribute("aria-hidden", "true");
+        }
+      };
+    }
+    if (copySqlBtn) {
+      copySqlBtn.onclick = () => {
+        const code = document.getElementById("sqlCodeContent")?.textContent || "";
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(code).then(() => {
+            copySqlBtn.textContent = "✓ SQL Copied!";
+            setTimeout(() => { copySqlBtn.textContent = "📋 Copy SQL"; }, 2500);
+            this.showToast("SQL copied to clipboard!");
+          });
+        }
+      };
+    }
+
     // Forgot password
     const forgotBtn = document.getElementById("forgotPasswordBtn");
     if (forgotBtn) {
@@ -262,9 +313,16 @@ const Auth = {
     if (event === "SIGNED_IN") {
       this.closeModal();
       this.showToast(`Welcome back, ${this.getUserDisplayName()}!`);
+      // Automatically pull & sync user entries from Supabase account
+      if (window.DB && typeof DB.syncWithCloud === "function") {
+        DB.syncWithCloud();
+      }
     } else if (event === "SIGNED_OUT") {
       this.closeUserMenu();
       this.showToast("Signed out successfully.");
+      if (window.DB && typeof DB.updateSyncUI === "function") {
+        DB.updateSyncUI("local");
+      }
     }
   },
 
