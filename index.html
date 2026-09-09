@@ -6,9 +6,13 @@
   <meta name="theme-color" content="#f7f5f1">
   <title>Journal — A quiet place to write</title>
   <link rel="manifest" href="manifest.json">
+  <!-- Modern Editorial & UI Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/app.css">
 </head>
-<body>
+<body class="theme-paper">
   <div class="app">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
@@ -16,26 +20,41 @@
         <div><strong>Journal</strong><span>A quiet place to write</span></div>
       </div>
 
+      <!-- Writing Streak Widget -->
+      <div class="streak-widget" id="streakWidget" title="Your writing streak">
+        <span class="streak-icon">🔥</span>
+        <div class="streak-info">
+          <strong id="streakCount">1</strong>
+          <span>Day Writing Streak</span>
+        </div>
+      </div>
+
       <button class="new-entry-btn" id="newEntryBtn"><span>＋</span> New entry <kbd>N</kbd></button>
 
       <div class="sidebar-section">
         <div class="section-label">Journals</div>
         <button class="nav-item active" data-journal="all"><span>✦</span> All entries <b id="allCount">0</b></button>
-        <button class="nav-item" data-journal="Personal"><span>○</span> Personal <b></b></button>
-        <button class="nav-item" data-journal="Work"><span>○</span> Work <b></b></button>
-        <button class="nav-item" data-journal="Travel"><span>○</span> Travel <b></b></button>
+        <button class="nav-item" data-journal="Personal"><span class="j-dot dot-personal">●</span> Personal <b></b></button>
+        <button class="nav-item" data-journal="Work"><span class="j-dot dot-work">●</span> Work <b></b></button>
+        <button class="nav-item" data-journal="Travel"><span class="j-dot dot-travel">●</span> Travel <b></b></button>
+        <button class="nav-item" data-journal="Gratitude"><span class="j-dot dot-gratitude">●</span> Gratitude <b></b></button>
+        <button class="nav-item" data-journal="Ideas"><span class="j-dot dot-ideas">●</span> Ideas <b></b></button>
       </div>
 
       <div class="sidebar-section">
-        <div class="section-label">Collections</div>
+        <div class="section-label">Moments & Views</div>
+        <button class="nav-item" data-view="onthisday"><span>🕰</span> On this day</button>
         <button class="nav-item" data-view="calendar"><span>▦</span> Calendar</button>
+        <button class="nav-item" data-view="insights"><span>📊</span> Insights & Moods</button>
         <button class="nav-item" data-view="favorites"><span>♡</span> Favorites</button>
         <button class="nav-item" data-view="photos"><span>▧</span> Photos</button>
       </div>
 
       <div class="sidebar-bottom">
-        <button class="nav-item" id="themeBtn"><span>☾</span> Appearance</button>
-        <button class="nav-item" id="exportBtn"><span>↓</span> Export journal</button>
+        <button class="nav-item" id="sidebarAuthBtn"><span>👤</span> <span id="authStatusText">Sign in</span></button>
+        <button class="nav-item" id="themeBtn"><span>🎨</span> Theme palette</button>
+        <button class="nav-item" id="lockBtn"><span>🔒</span> Privacy lock</button>
+        <button class="nav-item" id="exportBtn"><span>↓</span> Export & Print</button>
       </div>
     </aside>
 
@@ -44,12 +63,28 @@
         <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Menu">☰</button>
         <div class="search-wrap">
           <span>⌕</span>
-          <input id="searchInput" placeholder="Search your journal…" autocomplete="off">
+          <input id="searchInput" placeholder="Search entries, tags, moods, locations…" autocomplete="off">
           <kbd>⌘ K</kbd>
         </div>
+
         <div class="top-actions">
-          <button class="icon-btn" id="themeTopBtn" aria-label="Toggle theme">☼</button>
-          <button class="avatar">A</button>
+          <button class="prompt-chip-btn" id="topbarPromptBtn"><span>✨</span> Daily prompt</button>
+          <button class="icon-btn" id="themeTopBtn" title="Cycle theme" aria-label="Toggle theme">☼</button>
+          <div class="auth-action-wrap">
+            <button class="auth-trigger-btn" id="authTriggerBtn" aria-label="Account">
+              <span class="avatar anon" id="userAvatar">Sign in</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+              <div class="dropdown-header">
+                <strong id="dropdownUserName">Account</strong>
+                <span id="dropdownUserEmail">user@example.com</span>
+              </div>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item" id="logoutBtn">
+                <span>→</span> Sign out
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -59,7 +94,9 @@
             <p class="eyebrow" id="viewEyebrow">YOUR JOURNAL</p>
             <h1 id="viewTitle">All entries</h1>
           </div>
-          <button class="date-btn" id="todayBtn">Today <span>⌄</span></button>
+          <div class="content-head-actions">
+            <button class="date-btn" id="todayBtn">Today <span>⌄</span></button>
+          </div>
         </div>
 
         <div id="appView"></div>
@@ -69,37 +106,259 @@
 
   <div class="overlay" id="overlay"></div>
 
+  <!-- Theme Palette Modal -->
+  <div class="modal-overlay" id="themeModalOverlay" aria-hidden="true">
+    <div class="theme-modal" role="dialog" aria-modal="true">
+      <button class="modal-close-btn" id="closeThemeModal">×</button>
+      <h3>Select Theme Palette</h3>
+      <p>Choose an editorial aesthetic crafted for quiet focus.</p>
+      <div class="theme-grid">
+        <button class="theme-card active" data-theme="paper">
+          <div class="theme-preview paper-prev"></div>
+          <strong>Paper Linen</strong>
+          <span>Warm editorial cream</span>
+        </button>
+        <button class="theme-card" data-theme="midnight">
+          <div class="theme-preview midnight-prev"></div>
+          <strong>Midnight Obsidian</strong>
+          <span>Pure OLED deep black</span>
+        </button>
+        <button class="theme-card" data-theme="sage">
+          <div class="theme-preview sage-prev"></div>
+          <strong>Sage Garden</strong>
+          <span>Calm earthy forest tones</span>
+        </button>
+        <button class="theme-card" data-theme="twilight">
+          <div class="theme-preview twilight-prev"></div>
+          <strong>Twilight Rose</strong>
+          <span>Dusky evening plum & amber</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy PIN Lock Overlay -->
+  <div class="pin-lock-overlay" id="pinLockOverlay" aria-hidden="true">
+    <div class="pin-lock-card">
+      <div class="pin-lock-icon">🔒</div>
+      <h2>Journal Locked</h2>
+      <p id="pinPromptText">Enter your 4-digit privacy passcode</p>
+      <div class="pin-dots">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+      </div>
+      <div class="pin-keypad">
+        <button class="pin-key">1</button>
+        <button class="pin-key">2</button>
+        <button class="pin-key">3</button>
+        <button class="pin-key">4</button>
+        <button class="pin-key">5</button>
+        <button class="pin-key">6</button>
+        <button class="pin-key">7</button>
+        <button class="pin-key">8</button>
+        <button class="pin-key">9</button>
+        <button class="pin-key action" id="pinClearBtn">Clear</button>
+        <button class="pin-key">0</button>
+        <button class="pin-key action" id="pinCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo Lightbox Modal -->
+  <div class="lightbox-overlay" id="lightboxOverlay" aria-hidden="true">
+    <button class="lightbox-close" id="closeLightbox">×</button>
+    <img id="lightboxImg" src="" alt="Enlarged memory">
+  </div>
+
+  <!-- Auth Modal Dialog -->
+  <div class="modal-overlay" id="authModalOverlay" aria-hidden="true">
+    <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <button class="modal-close-btn" id="closeAuthModal" aria-label="Close modal">×</button>
+      
+      <div class="auth-header">
+        <div class="brand-mark modal-brand">J</div>
+        <h2 id="authModalTitle">Journal Account</h2>
+        <p>Sign in to your account with Supabase</p>
+      </div>
+
+      <div class="auth-alert" id="authAlert" style="display: none;"></div>
+
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab active" id="tabSignIn" role="tab">Sign in</button>
+        <button type="button" class="auth-tab" id="tabSignUp" role="tab">Create account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form class="auth-pane active" id="paneSignIn">
+        <div class="form-group">
+          <label for="signInEmail">Email</label>
+          <input type="email" id="signInEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <div class="label-row">
+            <label for="signInPassword">Password</label>
+            <a href="#" class="forgot-link" id="forgotPasswordBtn">Forgot password?</a>
+          </div>
+          <input type="password" id="signInPassword" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div class="form-check">
+          <label class="check-label">
+            <input type="checkbox" id="rememberMeCheckbox" checked>
+            <span>Stay signed in automatically</span>
+          </label>
+        </div>
+        <button type="submit" class="auth-submit-btn" id="signInSubmitBtn">Sign in</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form class="auth-pane" id="paneSignUp">
+        <div class="form-group">
+          <label for="signUpName">Full name</label>
+          <input type="text" id="signUpName" placeholder="Your Name" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="signUpEmail">Email</label>
+          <input type="email" id="signUpEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="signUpPassword">Password</label>
+          <input type="password" id="signUpPassword" placeholder="At least 6 characters" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-submit-btn" id="signUpSubmitBtn">Create account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Day One-Style Rich Editor Sanctuary -->
   <section class="editor-panel" id="editorPanel" aria-hidden="true">
     <header class="editor-head">
-      <button class="close-btn" id="closeEditor">×</button>
-      <span id="saveStatus">Saved</span>
-      <div>
-        <button class="subtle-btn" id="favoriteEditor">♡</button>
+      <button class="close-btn" id="closeEditor" title="Close editor (Esc)">×</button>
+      <div class="save-indicator">
+        <span class="save-dot"></span>
+        <span id="saveStatus">Saved</span>
+      </div>
+      <div class="editor-top-actions">
+        <button class="subtle-btn" id="zenToggleBtn" title="Distraction-free Zen mode">⛶ Zen</button>
+        <button class="subtle-btn" id="favoriteEditor" title="Favorite">♡</button>
         <button class="primary-btn" id="saveEntryBtn">Save entry</button>
       </div>
     </header>
+
     <div class="editor-body">
-      <div class="editor-date" id="editorDate"></div>
-      <input class="title-input" id="titleInput" placeholder="Give this entry a title…" maxlength="120">
-      <div class="toolbar">
-        <button data-cmd="bold"><b>B</b></button>
-        <button data-cmd="italic"><i>I</i></button>
-        <button data-cmd="formatBlock" data-value="blockquote">“</button>
-        <button data-cmd="insertUnorderedList">•</button>
-        <button id="photoBtn">＋ Photo</button>
+      <!-- Rich Metadata Bar -->
+      <div class="editor-meta-bar">
+        <div class="editor-date-wrap">
+          <span class="editor-date" id="editorDate"></span>
+          <input type="date" id="datePickerInput" class="hidden-date-input">
+        </div>
+
+        <!-- Mood Selector Pill -->
+        <div class="meta-popover-wrap">
+          <button class="meta-pill" id="moodPickerBtn" type="button">
+            <span id="currentMoodEmoji">🌿</span>
+            <span id="currentMoodLabel">Grateful</span>
+            <span class="caret">▾</span>
+          </button>
+          <div class="mood-popover" id="moodPopover">
+            <div class="mood-title">How are you feeling?</div>
+            <div class="mood-grid">
+              <button type="button" data-emoji="😊" data-label="Joyful" class="mood-opt">😊 Joyful</button>
+              <button type="button" data-emoji="😌" data-label="Calm" class="mood-opt">😌 Calm</button>
+              <button type="button" data-emoji="🌿" data-label="Grateful" class="mood-opt active">🌿 Grateful</button>
+              <button type="button" data-emoji="🤔" data-label="Reflective" class="mood-opt">🤔 Reflective</button>
+              <button type="button" data-emoji="⚡" data-label="Energized" class="mood-opt">⚡ Energized</button>
+              <button type="button" data-emoji="🌧" data-label="Melancholy" class="mood-opt">🌧 Melancholy</button>
+              <button type="button" data-emoji="🌸" data-label="Inspired" class="mood-opt">🌸 Inspired</button>
+              <button type="button" data-emoji="🍵" data-label="Peaceful" class="mood-opt">🍵 Peaceful</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weather & Location Pill -->
+        <button class="meta-pill" id="weatherLocationBtn" type="button" title="Click to edit weather & location">
+          <span id="weatherEmoji">☀️</span>
+          <span id="weatherText">22°C · Sunny</span>
+          <span class="bullet">·</span>
+          <span id="locationText">San Francisco</span>
+        </button>
+
+        <!-- Prompt Generator Pill -->
+        <button class="meta-pill prompt-pill" id="editorPromptBtn" type="button" title="Get a reflection prompt">
+          <span>✨ Prompt</span>
+        </button>
       </div>
-      <div class="editor" id="editor" contenteditable="true" data-placeholder="Start writing…"></div>
+
+      <!-- Title Input -->
+      <input class="title-input" id="titleInput" placeholder="Give this entry a title…" maxlength="140">
+
+      <!-- Enhanced Formatting Toolbar -->
+      <div class="toolbar">
+        <button data-cmd="formatBlock" data-value="h2" title="Heading 2"><b>H2</b></button>
+        <button data-cmd="formatBlock" data-value="h3" title="Heading 3"><b>H3</b></button>
+        <span class="tb-divider"></span>
+        <button data-cmd="bold" title="Bold (⌘B)"><b>B</b></button>
+        <button data-cmd="italic" title="Italic (⌘I)"><i>I</i></button>
+        <button data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+        <span class="tb-divider"></span>
+        <button data-cmd="formatBlock" data-value="blockquote" title="Quote">“</button>
+        <button data-cmd="insertUnorderedList" title="Bullet list">•</button>
+        <button id="todoBtn" title="Insert interactive checklist">☑</button>
+        <span class="tb-divider"></span>
+        <!-- Highlighter Dropdown -->
+        <div class="highlighter-wrap">
+          <button id="highlighterBtn" title="Highlight text">🖍 Highlighter ▾</button>
+          <div class="highlighter-menu" id="highlighterMenu">
+            <button data-color="#fef08a" class="hl-btn hl-yellow">Yellow</button>
+            <button data-color="#bbf7d0" class="hl-btn hl-green">Mint</button>
+            <button data-color="#fbcfe8" class="hl-btn hl-pink">Rose</button>
+          </div>
+        </div>
+        <span class="tb-divider"></span>
+        <button id="photoBtn" title="Attach photos">📷 Photo</button>
+        <button id="voiceRecordBtn" title="Record voice reflection" class="voice-btn">🎙 Voice</button>
+      </div>
+
+      <!-- Voice Memo Audio Widget (shown when recording or audio attached) -->
+      <div class="voice-widget" id="voiceWidget" style="display:none;">
+        <div class="voice-status">
+          <span class="voice-dot" id="voiceDot"></span>
+          <span id="voiceTimer">0:00</span>
+          <span id="voiceStateLabel">Recording voice reflection…</span>
+        </div>
+        <div class="voice-actions">
+          <button type="button" id="voiceStopBtn" class="voice-action-btn primary">Stop</button>
+          <audio id="voicePlayer" controls style="display:none;"></audio>
+          <button type="button" id="voiceDeleteBtn" class="voice-action-btn delete" style="display:none;">Delete audio</button>
+        </div>
+      </div>
+
+      <!-- Rich Writing Content Area -->
+      <div class="editor" id="editor" contenteditable="true" data-placeholder="Start writing your thoughts…"></div>
+
+      <!-- Attached Photos Gallery -->
       <div id="photoPreview" class="photo-preview"></div>
+
+      <!-- Editor Footer Meta -->
       <footer class="editor-meta">
-        <button id="journalPicker">Journal: <strong id="journalName">Personal</strong> ▾</button>
-        <button id="tagBtn">＋ Add tag</button>
-        <span id="wordCount">0 words</span>
+        <button id="journalPicker" type="button">Journal: <strong id="journalName">Personal</strong> ▾</button>
+        <button id="tagBtn" type="button">＋ Add tag</button>
+        <div id="entryTagsList" class="entry-tags-list"></div>
+        <span id="wordCount">0 words · 0 min read</span>
       </footer>
     </div>
   </section>
 
   <input type="file" id="photoInput" accept="image/*" multiple hidden>
 
+  <!-- Supabase Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Gitignored Local Supabase Config -->
+  <script src="config.js"></script>
+  <!-- Authentication Logic -->
+  <script src="js/auth.js"></script>
+  <!-- App Scripts -->
   <script src="js/db.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/editor.js"></script>

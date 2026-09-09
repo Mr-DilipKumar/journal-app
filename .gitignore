@@ -1,0 +1,16 @@
+# Supabase configuration & private credentials
+config.js
+supabase-config.js
+.env
+.env.local
+.env.*.local
+
+# Operating System & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
