@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f5f1">
+  <title>Journal — A quiet place to write</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">J</div>
+        <div><strong>Journal</strong><span>A quiet place to write</span></div>
+      </div>
+
+      <button class="new-entry-btn" id="newEntryBtn"><span>＋</span> New entry <kbd>N</kbd></button>
+
+      <div class="sidebar-section">
+        <div class="section-label">Journals</div>
+        <button class="nav-item active" data-journal="all"><span>✦</span> All entries <b id="allCount">0</b></button>
+        <button class="nav-item" data-journal="Personal"><span>○</span> Personal <b></b></button>
+        <button class="nav-item" data-journal="Work"><span>○</span> Work <b></b></button>
+        <button class="nav-item" data-journal="Travel"><span>○</span> Travel <b></b></button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Collections</div>
+        <button class="nav-item" data-view="calendar"><span>▦</span> Calendar</button>
+        <button class="nav-item" data-view="favorites"><span>♡</span> Favorites</button>
+        <button class="nav-item" data-view="photos"><span>▧</span> Photos</button>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="nav-item" id="themeBtn"><span>☾</span> Appearance</button>
+        <button class="nav-item" id="exportBtn"><span>↓</span> Export journal</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Menu">☰</button>
+        <div class="search-wrap">
+          <span>⌕</span>
+          <input id="searchInput" placeholder="Search your journal…" autocomplete="off">
+          <kbd>⌘ K</kbd>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="themeTopBtn" aria-label="Toggle theme">☼</button>
+          <button class="avatar">A</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="content-head">
+          <div>
+            <p class="eyebrow" id="viewEyebrow">YOUR JOURNAL</p>
+            <h1 id="viewTitle">All entries</h1>
+          </div>
+          <button class="date-btn" id="todayBtn">Today <span>⌄</span></button>
+        </div>
+
+        <div id="appView"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <section class="editor-panel" id="editorPanel" aria-hidden="true">
+    <header class="editor-head">
+      <button class="close-btn" id="closeEditor">×</button>
+      <span id="saveStatus">Saved</span>
+      <div>
+        <button class="subtle-btn" id="favoriteEditor">♡</button>
+        <button class="primary-btn" id="saveEntryBtn">Save entry</button>
+      </div>
+    </header>
+    <div class="editor-body">
+      <div class="editor-date" id="editorDate"></div>
+      <input class="title-input" id="titleInput" placeholder="Give this entry a title…" maxlength="120">
+      <div class="toolbar">
+        <button data-cmd="bold"><b>B</b></button>
+        <button data-cmd="italic"><i>I</i></button>
+        <button data-cmd="formatBlock" data-value="blockquote">“</button>
+        <button data-cmd="insertUnorderedList">•</button>
+        <button id="photoBtn">＋ Photo</button>
+      </div>
+      <div class="editor" id="editor" contenteditable="true" data-placeholder="Start writing…"></div>
+      <div id="photoPreview" class="photo-preview"></div>
+      <footer class="editor-meta">
+        <button id="journalPicker">Journal: <strong id="journalName">Personal</strong> ▾</button>
+        <button id="tagBtn">＋ Add tag</button>
+        <span id="wordCount">0 words</span>
+      </footer>
+    </div>
+  </section>
+
+  <input type="file" id="photoInput" accept="image/*" multiple hidden>
+
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

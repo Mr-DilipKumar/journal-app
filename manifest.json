@@ -1,0 +1,9 @@
+{
+  "name":"Journal — A quiet place to write",
+  "short_name":"Journal",
+  "start_url":".",
+  "display":"standalone",
+  "background_color":"#f7f5f1",
+  "theme_color":"#f7f5f1",
+  "icons":[]
+}
