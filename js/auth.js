@@ -16,8 +16,12 @@ const Auth = {
 
   getConfig() {
     const fileConfig = window.SUPABASE_CONFIG || {};
-    const url = (fileConfig.url && fileConfig.url.trim()) || "";
-    const anonKey = (fileConfig.anonKey && fileConfig.anonKey.trim()) || "";
+    // Direct built-in credentials for cloud sync & auth
+    const defaultUrl = "https://uhpojlnkpliknifhlrft.supabase.co";
+    const defaultKey = "sb_publishable_JylRGEVBzr8J0urSzQIeBA_NubZ-n68";
+
+    const url = (fileConfig.url && fileConfig.url.trim()) || defaultUrl;
+    const anonKey = (fileConfig.anonKey && fileConfig.anonKey.trim()) || defaultKey;
 
     const isPlaceholder = url.includes("your-project-id") || anonKey.includes("your-anon-public-key");
     const valid = url.startsWith("https://") && anonKey.length > 20 && !isPlaceholder;
@@ -28,37 +32,52 @@ const Auth = {
   setupClient() {
     const { url, anonKey, valid } = this.getConfig();
 
-    if (valid && window.supabase && typeof window.supabase.createClient === "function") {
-      try {
-        this.client = window.supabase.createClient(url, anonKey, {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true,
-            storage: window.localStorage
-          }
-        });
-        this.isConfigured = true;
+    if (!valid) {
+      this.isConfigured = false;
+      this.updateUI(null);
+      return;
+    }
 
-        // Check active session or trigger auto-login
-        this.client.auth.getSession().then(({ data, error }) => {
-          if (!error && data?.session) {
-            this.handleAuthState("SIGNED_IN", data.session);
-          } else {
-            this.checkAndAutoLogin();
-          }
-        });
-
-        // Listen for auth state changes
-        this.client.auth.onAuthStateChange((event, session) => {
-          this.handleAuthState(event, session);
-        });
-      } catch (err) {
-        console.error("Failed to initialize Supabase client:", err);
-        this.isConfigured = false;
-        this.updateUI(null);
+    const supabaseLib = window.supabase;
+    if (!supabaseLib || typeof supabaseLib.createClient !== "function") {
+      // Retry in 100ms in case script is still loading
+      if (!this._retryTimer) {
+        this._retryTimer = setTimeout(() => {
+          this._retryTimer = null;
+          this.setupClient();
+        }, 100);
       }
-    } else {
+      return;
+    }
+
+    try {
+      this.client = supabaseLib.createClient(url, anonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storage: window.localStorage
+        }
+      });
+      this.isConfigured = true;
+
+      // Check active session or trigger auto-login
+      this.client.auth.getSession().then(({ data, error }) => {
+        if (!error && data?.session) {
+          this.handleAuthState("SIGNED_IN", data.session);
+        } else {
+          this.checkAndAutoLogin();
+        }
+      }).catch(err => {
+        console.warn("Session check error:", err);
+      });
+
+      // Listen for auth state changes
+      this.client.auth.onAuthStateChange((event, session) => {
+        this.handleAuthState(event, session);
+      });
+    } catch (err) {
+      console.error("Failed to initialize Supabase client:", err);
       this.isConfigured = false;
       this.updateUI(null);
     }
@@ -383,8 +402,11 @@ const Auth = {
   },
 
   checkConfigured() {
-    if (!this.isConfigured) {
-      this.showAlert("Please add your Supabase URL and Anon Key in config.js (which is protected by .gitignore).");
+    if (!this.isConfigured || !this.client) {
+      this.setupClient();
+    }
+    if (!this.isConfigured || !this.client) {
+      this.showAlert("Connecting to Supabase cloud... please try again in a moment.");
       return false;
     }
     return true;

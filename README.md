@@ -1,51 +1,36 @@
-# Journal
+# Journal — Premium Journaling App
 
-A calm, Day One–inspired journaling web app built with plain HTML, CSS, and JavaScript.
+A calm, Day One–inspired personal journaling web app built with HTML5, CSS3, and modern JavaScript.
 
 ## Features
-- Supabase Authentication (Sign in, Sign up, Password reset, and Account menu)
-- Secure credential management (Supabase URL and Key in `.gitignore`)
-- Timeline journal
-- Rich text editor
-- Browser persistence with IndexedDB
-- Photos stored locally in the browser
-- Journals: Personal, Work, Travel
-- Search
-- Calendar
-- Favorites
-- Photo gallery
-- Dark mode
-- JSON export
-- Responsive layout
+- **Supabase Cloud Sync & Authentication**: Instant sign-in, remembered credentials, auto-login, and profile manager
+- **Day One Reflections**: Mood tracking (Joyful, Calm, Neutral, Sad, Challenging), weather & location tagging, 30+ daily reflection prompts
+- **Voice Memo Recording**: Built-in voice recorder with live timer, audio playback, and persistence
+- **Rich Text & Checklists**: Interactive markdown-style checkboxes, color highlighters, blockquotes, word & reading time counter
+- **Zen Focus Mode**: Distraction-free full-screen writing canvas with ambient soundscapes
+- **4 Crafted Aesthetics**: Paper (clean minimalist warm cream), Midnight (deep OLED dark mode), Sage (organic olive & pine), Twilight (nordic dusk)
+- **PIN Privacy Lock**: 4-digit security code with auto-lock protection
+- **On This Day & Insights**: Relive memories from past years, view mood distributions, and track journaling streaks
+- **Local Persistence & Offline Ready**: Fast IndexedDB storage with instant loading
 
-## Supabase Authentication Setup
+## Configuration
 
-1. **Create or copy configuration:**
-   Copy `config.example.js` to `config.js`:
-   ```bash
-   cp config.example.js config.js
-   ```
+Your Supabase project settings are stored directly in `config.js`:
 
-2. **Add your Supabase credentials:**
-   In `config.js`, set your Supabase Project URL and Anon Public Key:
-   ```javascript
-   window.SUPABASE_CONFIG = {
-     url: "https://your-project-id.supabase.co",
-     anonKey: "your-anon-public-key-here"
-   };
-   ```
-
-3. **Git Protection:**
-   `config.js` is automatically excluded by `.gitignore`, ensuring your secret keys are never committed or pushed to your repository.
-
-*(Alternatively, you can click "⚙ Keys" inside the in-app Sign In dialog to save credentials directly in your browser).*
-
-## Run
-
-Because IndexedDB and some browser features work best from a local server, run:
-
-```bash
-python3 -m http.server 8000
+```javascript
+window.SUPABASE_CONFIG = {
+  url: "https://uhpojlnkpliknifhlrft.supabase.co",
+  anonKey: "sb_publishable_JylRGEVBzr8J0urSzQIeBA_NubZ-n68"
+};
 ```
 
-Then open http://localhost:8000
+## Running Locally
+
+To start the local preview server:
+
+```bash
+python -m http.server 8000
+```
+
+Then visit [http://localhost:8000](http://localhost:8000) in your browser.
+

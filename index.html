@@ -352,9 +352,14 @@
 
   <input type="file" id="photoInput" accept="image/*" multiple hidden>
 
-  <!-- Supabase Client Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Gitignored Local Supabase Config -->
+  <!-- Supabase Client Library (Local with CDN fallback) -->
+  <script src="js/supabase.js"></script>
+  <script>
+    if (!window.supabase) {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
+  <!-- Supabase Configuration -->
   <script src="config.js"></script>
   <!-- Authentication Logic -->
   <script src="js/auth.js"></script>
